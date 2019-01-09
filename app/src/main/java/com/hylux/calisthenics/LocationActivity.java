@@ -3,8 +3,6 @@ package com.hylux.calisthenics;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.location.Location;
-import android.os.Debug;
-import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -25,7 +23,6 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.tasks.OnSuccessListener;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -46,7 +43,9 @@ public class LocationActivity extends AppCompatActivity
     private LocationCallback locationCallback;
     private Location lastLocation;
     private List<Location> locations;
-    private TextView currentLocation, updateTime;
+    private double totalDistance;
+    private float currentSpeed;
+    private TextView currentLocationView, updateTimeView, currentSpeedView, totalDistanceView;
     private long updateInterval;
     private final long FASTEST_INTERVAL = 1000;
 
@@ -68,8 +67,13 @@ public class LocationActivity extends AppCompatActivity
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this).build();
 
+        this.totalDistance = 0;
+
         this.fusedClient = LocationServices.getFusedLocationProviderClient(this);
 
+        //TODO Check if Location Services are turned on or not.
+
+        //TODO Seems like it somehow stops collecting data after awhile.
         this.locationCallback = new LocationCallback() {
 
             @Override
@@ -79,19 +83,30 @@ public class LocationActivity extends AppCompatActivity
                     return;
                 }
 
-                Calendar calendar = Calendar.getInstance();
+                Location newLastLocation = result.getLastLocation();
+                currentSpeed = newLastLocation.getSpeed();
 
-                updateTime.setText(String.valueOf(calendar.getTime()));
+                //TODO Highly inaccurate
+                if (lastLocation != null) {
+                    totalDistance += lastLocation.distanceTo(newLastLocation);
+                }
 
-                lastLocation = result.getLastLocation();
-                currentLocation.setText(lastLocation.toString());
+                lastLocation = newLastLocation;
                 locations.add(lastLocation);
+
+                updateTimeView.setText(String.valueOf(Calendar.getInstance().getTime()));
+                currentLocationView.setText("Lat: " + lastLocation.getLatitude() + "/n Long: " + lastLocation.getLongitude());
+                currentSpeedView.setText("Current speed: " + String.valueOf(currentSpeed));
+                totalDistanceView.setText("Total distance: " + totalDistance + " m");
+
                 Log.d("LOCATIONS", locations.toString());
             }
         };
 
-        this.currentLocation = findViewById(R.id.currentLocation);
-        this.updateTime = findViewById(R.id.updateTime);
+        this.currentLocationView = findViewById(R.id.currentLocation);
+        this.updateTimeView = findViewById(R.id.updateTime);
+        this.currentSpeedView = findViewById(R.id.currentSpeed);
+        this.totalDistanceView = findViewById(R.id.totalDistance);
 
         this.updateInterval = 5000;
         this.locations = new ArrayList<>();
@@ -153,16 +168,6 @@ public class LocationActivity extends AppCompatActivity
             Log.d("STATE", "try requestLocationUpdates");
             Log.d("STATE", locationCallback.toString());
             fusedClient.requestLocationUpdates(locationRequest, locationCallback, null /* Looper */);
-
-            /*fusedClient.getLastLocation().addOnSuccessListener(new OnSuccessListener<Location>() {
-                @Override
-                public void onSuccess(Location location) {
-                    lastLocation = location;
-                    currentLocation.setText(lastLocation.toString());
-                    locations.add(location);
-                    Log.d("LOCATIONS", locations.toString());
-                }
-            });*/
         } catch (SecurityException e) {
             havePermissions();
         }
@@ -184,7 +189,7 @@ public class LocationActivity extends AppCompatActivity
         Log.d("STATE", "onResume");
 
         if (!checkPlayServices()) {
-            currentLocation.setText(R.string.no_google_play_services_warning);
+            currentLocationView.setText(R.string.no_google_play_services_warning);
         }
     }
 
@@ -266,7 +271,7 @@ public class LocationActivity extends AppCompatActivity
 
         if (location != null) {
             lastLocation = location;
-            currentLocation.setText(location.toString());
+            currentLocationView.setText(location.toString());
             locations.add(location);
             Log.d("LOCATIONS", locations.toString());
         }
