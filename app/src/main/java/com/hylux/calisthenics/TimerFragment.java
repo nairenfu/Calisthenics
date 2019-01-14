@@ -66,7 +66,7 @@ public class TimerFragment extends Fragment {
                     @Override
                     public void onFinish() {
                         timeRemainingView.setText("STOP");
-                        
+
                     }
                 }.start();
                 break;
