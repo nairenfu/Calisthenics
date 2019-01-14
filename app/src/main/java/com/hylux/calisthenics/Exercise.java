@@ -1,16 +1,19 @@
 package com.hylux.calisthenics;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 public class Exercise {
 
     private Date startTime;
     private double duration;
-    private int sets, reps;
+    private List<Integer> reps;
 
     public Exercise() {
         this.startTime = Calendar.getInstance().getTime();
+        reps = new ArrayList<>();
     }
 
     public Date getStartTime() {
@@ -30,18 +33,26 @@ public class Exercise {
     }
 
     public int getSets() {
-        return sets;
-    }
-
-    public void setSets(int sets) {
-        this.sets = sets;
+        return reps.size();
     }
 
     public int getReps() {
-        return reps;
+        int total = 0;
+        for (int rep : reps) {
+            total += rep;
+        }
+        return total;
     }
 
-    public void setReps(int reps) {
-        this.reps = reps;
+    public int getReps(int set) {
+        return reps.get(set);
+    }
+
+    public void setReps(int set, int rep) {
+        reps.set(set, rep);
+    }
+
+    public void addReps(int rep) {
+        reps.add(rep);
     }
 }
