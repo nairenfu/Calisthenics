@@ -5,10 +5,17 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.support.constraint.ConstraintLayout;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class StaticActivity extends AppCompatActivity implements SensorEventListener {
 
@@ -21,12 +28,19 @@ public class StaticActivity extends AppCompatActivity implements SensorEventList
     private StaticExercise exercise;
 
     private boolean DOWN, UP;
-    private int currentSet;
+    private int currentSet, numSets;
+    private List<Integer> config;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_static);
+
+        config = new ArrayList<>();
+        Bundle args = getIntent().getExtras();
+        if (args != null) {
+            config = args.getIntegerArrayList("EXTRA_CONFIG");
+        }
 
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         proximitySensor = sensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY);
@@ -40,6 +54,11 @@ public class StaticActivity extends AppCompatActivity implements SensorEventList
         DOWN = false;
         UP = false;
         currentSet = 0;
+        numSets = 0;
+    }
+
+    @Override
+    public void onAttachFragment(Fragment fragment) {
     }
 
     @Override
@@ -65,11 +84,28 @@ public class StaticActivity extends AppCompatActivity implements SensorEventList
             DOWN = false;
             UP = false;
 
-            if (currentSet == 10) {
+            if (currentSet == config.get(1)) {
                 exercise.addReps(10);
                 currentSet = 0;
-                timerFragment = TimerFragment.newInstance(TimerFragment.TIME, 5000, 1000);
-                fm.beginTransaction().add(R.id.parentLayout, timerFragment).commit();
+                numSets += 1;
+
+                //TODO pause the sensor or ignore changes while timer is running
+
+                if (numSets == config.get(0)) {
+                    final TextView totalReps = new TextView(getApplicationContext());
+                    totalReps.setText(String.valueOf(exercise.getReps()));
+                    ConstraintLayout parentLayout = findViewById(R.id.parentLayout);
+                    parentLayout.addView(totalReps);
+                } else {
+                    timerFragment = TimerFragment.newInstance(TimerFragment.TIME, config.get(2), 1000);
+                    timerFragment.setOnTimerEndedListener(new TimerFragment.OnTimerEndedListener() {
+                        @Override
+                        public void onTimerEnded() {
+                            fm.beginTransaction().remove(timerFragment).commit();
+                        }
+                    });
+                    fm.beginTransaction().add(R.id.parentLayout, timerFragment).commit();
+                }
             }
         }
     }

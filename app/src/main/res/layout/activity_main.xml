@@ -4,12 +4,17 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@+id/mainActivity"
     tools:context=".MainActivity">
 
     <RadioGroup
         android:id="@+id/exercises"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" >
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
         <RadioButton
             android:id="@+id/startRun"
@@ -32,4 +37,16 @@
             android:layout_weight="1"
             android:text="Start" />
     </RadioGroup>
+
+    <!-- TODO Hacky, find a better solution -->
+    <FrameLayout
+        android:id="@+id/extraFragment"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/exercises">
+
+    </FrameLayout>
 </android.support.constraint.ConstraintLayout>

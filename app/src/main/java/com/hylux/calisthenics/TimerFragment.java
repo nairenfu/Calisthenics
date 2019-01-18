@@ -1,5 +1,6 @@
 package com.hylux.calisthenics;
 
+import android.app.Activity;
 import android.arch.lifecycle.Lifecycle;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -25,6 +26,8 @@ public class TimerFragment extends Fragment {
     private long duration, interval;
 
     private CountDownTimer countDownTimer;
+
+    private OnTimerEndedListener callback;
 
     public TimerFragment() {
         Log.d("TIMER", "STARTED");
@@ -66,7 +69,7 @@ public class TimerFragment extends Fragment {
                     @Override
                     public void onFinish() {
                         timeRemainingView.setText("STOP");
-
+                        callback.onTimerEnded();
                     }
                 }.start();
                 break;
@@ -96,7 +99,16 @@ public class TimerFragment extends Fragment {
             @Override
             public void onFinish() {
                 timeRemainingView.setText("START");
+                callback.onTimerEnded();
             }
         }.start();
+    }
+
+    public interface OnTimerEndedListener {
+        void onTimerEnded();
+    }
+
+    public void setOnTimerEndedListener(OnTimerEndedListener listener) {
+        callback = listener;
     }
 }
