@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 
@@ -22,6 +23,7 @@ public class TimerFragment extends Fragment {
     private int style;
 
     private TextView timeRemainingView;
+    private ProgressBar timeRemainingBarView;
 
     private long duration, interval;
 
@@ -57,6 +59,9 @@ public class TimerFragment extends Fragment {
         View parent = inflater.inflate(R.layout.fragment_timer, container, false);
 
         timeRemainingView = parent.findViewById(R.id.timeRemaining);
+        timeRemainingBarView = parent.findViewById(R.id.progressBar);
+        timeRemainingBarView.setMax((int) duration);
+
 
         switch (style) {
             case TIME:
@@ -64,6 +69,7 @@ public class TimerFragment extends Fragment {
                     @Override
                     public void onTick(long millisUntilFinished) {
                         timeRemainingView.setText(String.valueOf(millisUntilFinished/1000));
+                        timeRemainingBarView.setProgress((int) millisUntilFinished);
                     }
 
                     @Override

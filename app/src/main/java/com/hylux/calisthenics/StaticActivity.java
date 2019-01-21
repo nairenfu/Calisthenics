@@ -25,10 +25,13 @@ public class StaticActivity extends AppCompatActivity implements SensorEventList
     private FragmentManager fm;
     private TimerFragment timerFragment;
 
+    private TextView repsView, setsView, totalRepsView;
+
     private StaticExercise exercise;
 
     private boolean DOWN, UP;
     private int currentSet, numSets;
+    //0 sets, 1 reps, 2 time
     private List<Integer> config;
 
     @Override
@@ -47,6 +50,14 @@ public class StaticActivity extends AppCompatActivity implements SensorEventList
 
         fm = getSupportFragmentManager();
         //timerFragment = TimerFragment.newInstance(TimerFragment.REPS, 5000, 1000);
+
+        repsView = findViewById(R.id.reps);
+        setsView = findViewById(R.id.sets);
+        totalRepsView = findViewById(R.id.totalReps);
+
+        repsView.setText("Reps completed: 0 out of " + config.get(1));
+        setsView.setText("Sets completed: 0 out of " + config.get(0));
+        totalRepsView.setText("Total reps: ");
 
         exercise = new StaticExercise();
         Log.d("START", String.valueOf(exercise.getStartTime()));
@@ -80,6 +91,7 @@ public class StaticActivity extends AppCompatActivity implements SensorEventList
         }
         if (DOWN && UP) {
             currentSet += 1;
+            repsView.setText("Reps: " + currentSet + " out of " + config.get(1));
             Log.d("CURRENT SET", String.valueOf(currentSet));
             DOWN = false;
             UP = false;
@@ -88,13 +100,14 @@ public class StaticActivity extends AppCompatActivity implements SensorEventList
                 exercise.addReps(10);
                 currentSet = 0;
                 numSets += 1;
+                setsView.setText("Sets: " + numSets + " out of " + config.get(0));
 
                 //TODO pause the sensor or ignore changes while timer is running
 
                 if (numSets == config.get(0)) {
                     final TextView totalReps = new TextView(getApplicationContext());
                     totalReps.setText(String.valueOf(exercise.getReps()));
-                    ConstraintLayout parentLayout = findViewById(R.id.parentLayout);
+                    LinearLayout parentLayout = findViewById(R.id.parentLayout);
                     parentLayout.addView(totalReps);
                 } else {
                     timerFragment = TimerFragment.newInstance(TimerFragment.TIME, config.get(2), 1000);
