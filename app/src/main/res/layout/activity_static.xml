@@ -22,4 +22,10 @@
         android:id="@+id/totalReps"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
+
+    <Button
+        android:id="@+id/finishSet"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Finish Set" />
 </LinearLayout>

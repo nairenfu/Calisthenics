@@ -66,9 +66,11 @@ public class TimerFragment extends Fragment {
         switch (style) {
             case TIME:
                 countDownTimer = new CountDownTimer(duration, interval) {
+                    //TODO implement own timer. Sometimes skips onTick() due to load on main
                     @Override
                     public void onTick(long millisUntilFinished) {
-                        timeRemainingView.setText(String.valueOf(millisUntilFinished/1000));
+                        Log.d("TIME", String.valueOf(millisUntilFinished));
+                        timeRemainingView.setText(String.valueOf(millisUntilFinished/1000 + 1));
                         timeRemainingBarView.setProgress((int) millisUntilFinished);
                     }
 

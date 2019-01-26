@@ -47,7 +47,9 @@ public class MainActivity extends AppCompatActivity {
                     case R.id.startStatic:
                         //intent = new Intent(getApplicationContext(), StaticActivity.class);
                         SelectorFragment selectorFragment = new SelectorFragment();
-                        fm.beginTransaction().add(R.id.extraFragment, selectorFragment).commit();
+                        fm.beginTransaction().replace(R.id.extraFragment, selectorFragment).commit();
+
+                        Log.d("FRAGMENTS", fm.getFragments().toString());
 
                         selectorFragment.setOnConfirmConfigListener(new SelectorFragment.OnConfirmConfigListener() {
                             @Override
@@ -62,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
                                 args.putIntegerArrayList("EXTRA_CONFIG", argsList);
                                 intent.putExtras(args);
                                 startActivity(intent);
-                                finish();
+                                //finish();
                             }
                         });
                         break;
